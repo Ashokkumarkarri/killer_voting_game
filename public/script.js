@@ -1,60 +1,60 @@
 const socket = io();
-let playerName = '';
 
-document.getElementById('joinGame').addEventListener('click', () => {
-    playerName = document.getElementById('playerName').value;
-    if (playerName) {
-        socket.emit('joinGame', playerName);
-        document.getElementById('joinSection').style.display = 'none';
-        document.getElementById('playerSection').style.display = 'block';
+document.addEventListener('DOMContentLoaded', () => {
+    const playerList = document.getElementById('player-list');
+    const voteList = document.getElementById('vote-list');
+    const playerStatus = document.getElementById('player-status');
+    const votingSection = document.getElementById('voting-section');
+    const statusSection = document.getElementById('status-section');
+    const submitVoteButton = document.getElementById('submit-vote');
+
+    // Update player list
+    socket.on('updatePlayers', (players) => {
+        playerList.innerHTML = '';
+        players.forEach(player => {
+            const div = document.createElement('div');
+            div.textContent = `${player.name} - ${player.status}`;
+            playerList.appendChild(div);
+        });
+
+        // Display voting section if game has started
+        if (players.every(player => player.status === 'ready')) {
+            votingSection.style.display = 'block';
+            updateVoteList(players);
+        }
+    });
+
+    // Update voting options
+    function updateVoteList(players) {
+        voteList.innerHTML = '';
+        players.forEach(player => {
+            if (player.status === 'active') {
+                const button = document.createElement('button');
+                button.textContent = player.name;
+                button.onclick = () => voteForPlayer(player.id);
+                voteList.appendChild(button);
+            }
+        });
     }
-});
 
-// Update players in the game
-socket.on('updatePlayers', (players) => {
-    const playerList = document.getElementById('playerList');
-    playerList.innerHTML = '';
-    players.forEach(player => {
-        const li = document.createElement('li');
-        li.textContent = `${player.name} - ${player.ready ? 'Ready' : 'Not Ready'}`;
-        playerList.appendChild(li);
+    // Handle vote submission
+    submitVoteButton.addEventListener('click', () => {
+        socket.emit('submitVote');
     });
-});
 
-// Player clicks ready
-document.getElementById('readyButton').addEventListener('click', () => {
-    socket.emit('playerReady');
-    document.getElementById('readyButton').disabled = true;
-});
-
-// Start voting
-socket.on('startVoting', (players) => {
-    document.getElementById('playerSection').style.display = 'none';
-    document.getElementById('votingSection').style.display = 'block';
-
-    const voteList = document.getElementById('voteList');
-    voteList.innerHTML = '';
-    players.forEach(player => {
-        const li = document.createElement('li');
-        li.innerHTML = `${player.name} <button onclick="vote('${player.id}')">Vote</button>`;
-        voteList.appendChild(li);
+    // Show player status and votes
+    socket.on('updateStatus', (status) => {
+        playerStatus.innerHTML = '';
+        status.forEach(player => {
+            const div = document.createElement('div');
+            div.textContent = `${player.name} - Votes: ${player.votes} - ${player.voted ? 'Voted' : 'Not Voted'}`;
+            playerStatus.appendChild(div);
+        });
+        statusSection.style.display = 'block';
     });
-});
 
-// Vote for a player
-function vote(playerId) {
-    socket.emit('votePlayer', playerId);
-}
-
-// Handle elimination
-socket.on('eliminatePlayer', (playerName) => {
-    document.getElementById('votingSection').style.display = 'none';
-    document.getElementById('resultsSection').style.display = 'block';
-    document.getElementById('resultsMessage').textContent = `${playerName} has been eliminated!`;
-});
-
-// Handle revote in case of a draw
-socket.on('drawRevote', () => {
-    document.getElementById('resultsSection').style.display = 'block';
-    document.getElementById('resultsMessage').textContent = `It's a draw! Revote.`;
+    // Handle voting
+    function voteForPlayer(playerId) {
+        socket.emit('vote', playerId);
+    }
 });
