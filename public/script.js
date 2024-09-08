@@ -1,37 +1,68 @@
-// Sample players array
-let players = ['Alice', 'Bob', 'Charlie', 'David'];
+const socket = io();
 
-// Add players dynamically
+// Ask the user for their name
+const playerName = prompt("Enter your name to join the game:");
+socket.emit('new-player', playerName);
+
+// Listen for player list updates from the server
 const playerList = document.getElementById('players');
 const voteOptions = document.getElementById('vote-options');
-players.forEach(player => {
-    let li = document.createElement('li');
-    li.innerText = player;
-    playerList.appendChild(li);
+let selectedVote = null;
+let players = [];
 
-    // Voting options for each player
-    let voteDiv = document.createElement('div');
-    voteDiv.innerText = player;
-    voteDiv.dataset.playerName = player;
-    voteDiv.classList.add('vote-option');
-    voteOptions.appendChild(voteDiv);
+socket.on('player-list', (playerArray) => {
+    players = playerArray;
+    updatePlayerList();
+    updateVoteOptions();
 });
 
-// Handle vote submission
-let selectedVote = null;
+// Update the player list in the UI
+function updatePlayerList() {
+    playerList.innerHTML = '';
+    players.forEach(player => {
+        const li = document.createElement('li');
+        li.innerText = player.name + (player.voted ? ' (Voted)' : '');
+        playerList.appendChild(li);
+    });
+}
+
+// Update the voting options dynamically
+function updateVoteOptions() {
+    voteOptions.innerHTML = '';
+    players.forEach(player => {
+        if (player.name !== playerName) {
+            const voteDiv = document.createElement('div');
+            voteDiv.innerText = player.name;
+            voteDiv.dataset.playerName = player.name;
+            voteDiv.classList.add('vote-option');
+            voteOptions.appendChild(voteDiv);
+        }
+    });
+}
+
+// Handle vote selection
 voteOptions.addEventListener('click', (e) => {
     if (e.target.classList.contains('vote-option')) {
         selectedVote = e.target.dataset.playerName;
-        alert(`You voted for ${selectedVote}`);
+        document.getElementById('submit-vote').disabled = false;
     }
 });
 
+// Handle vote submission
 document.getElementById('submit-vote').addEventListener('click', () => {
     if (selectedVote) {
-        document.getElementById('results').innerText = `You voted for ${selectedVote}`;
-    } else {
-        alert('Please select a player to vote for!');
+        socket.emit('vote', selectedVote);
+        document.getElementById('submit-vote').disabled = true;
     }
+});
+
+// Listen for vote updates from the server
+socket.on('update-votes', (votes) => {
+    let resultsText = 'Votes so far:\n';
+    for (const voterId in votes) {
+        resultsText += `${votes[voterId]} was voted.\n`;
+    }
+    document.getElementById('results').innerText = resultsText;
 });
 
 // Chat functionality
@@ -39,7 +70,6 @@ const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const sendMessageButton = document.getElementById('send-message');
 
-// Display chat messages
 function displayMessage(message) {
     let msgDiv = document.createElement('div');
     msgDiv.innerText = message;
@@ -47,7 +77,6 @@ function displayMessage(message) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Handle chat message send
 sendMessageButton.addEventListener('click', () => {
     const message = chatInput.value;
     if (message.trim() !== "") {
