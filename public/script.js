@@ -1,60 +1,57 @@
-const socket = io();
+// Sample players array
+let players = ['Alice', 'Bob', 'Charlie', 'David'];
 
-document.addEventListener('DOMContentLoaded', () => {
-    const playerList = document.getElementById('player-list');
-    const voteList = document.getElementById('vote-list');
-    const playerStatus = document.getElementById('player-status');
-    const votingSection = document.getElementById('voting-section');
-    const statusSection = document.getElementById('status-section');
-    const submitVoteButton = document.getElementById('submit-vote');
+// Add players dynamically
+const playerList = document.getElementById('players');
+const voteOptions = document.getElementById('vote-options');
+players.forEach(player => {
+    let li = document.createElement('li');
+    li.innerText = player;
+    playerList.appendChild(li);
 
-    // Update player list
-    socket.on('updatePlayers', (players) => {
-        playerList.innerHTML = '';
-        players.forEach(player => {
-            const div = document.createElement('div');
-            div.textContent = `${player.name} - ${player.status}`;
-            playerList.appendChild(div);
-        });
+    // Voting options for each player
+    let voteDiv = document.createElement('div');
+    voteDiv.innerText = player;
+    voteDiv.dataset.playerName = player;
+    voteDiv.classList.add('vote-option');
+    voteOptions.appendChild(voteDiv);
+});
 
-        // Display voting section if game has started
-        if (players.every(player => player.status === 'ready')) {
-            votingSection.style.display = 'block';
-            updateVoteList(players);
-        }
-    });
-
-    // Update voting options
-    function updateVoteList(players) {
-        voteList.innerHTML = '';
-        players.forEach(player => {
-            if (player.status === 'active') {
-                const button = document.createElement('button');
-                button.textContent = player.name;
-                button.onclick = () => voteForPlayer(player.id);
-                voteList.appendChild(button);
-            }
-        });
+// Handle vote submission
+let selectedVote = null;
+voteOptions.addEventListener('click', (e) => {
+    if (e.target.classList.contains('vote-option')) {
+        selectedVote = e.target.dataset.playerName;
+        alert(`You voted for ${selectedVote}`);
     }
+});
 
-    // Handle vote submission
-    submitVoteButton.addEventListener('click', () => {
-        socket.emit('submitVote');
-    });
+document.getElementById('submit-vote').addEventListener('click', () => {
+    if (selectedVote) {
+        document.getElementById('results').innerText = `You voted for ${selectedVote}`;
+    } else {
+        alert('Please select a player to vote for!');
+    }
+});
 
-    // Show player status and votes
-    socket.on('updateStatus', (status) => {
-        playerStatus.innerHTML = '';
-        status.forEach(player => {
-            const div = document.createElement('div');
-            div.textContent = `${player.name} - Votes: ${player.votes} - ${player.voted ? 'Voted' : 'Not Voted'}`;
-            playerStatus.appendChild(div);
-        });
-        statusSection.style.display = 'block';
-    });
+// Chat functionality
+const chatBox = document.getElementById('chat-box');
+const chatInput = document.getElementById('chat-input');
+const sendMessageButton = document.getElementById('send-message');
 
-    // Handle voting
-    function voteForPlayer(playerId) {
-        socket.emit('vote', playerId);
+// Display chat messages
+function displayMessage(message) {
+    let msgDiv = document.createElement('div');
+    msgDiv.innerText = message;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Handle chat message send
+sendMessageButton.addEventListener('click', () => {
+    const message = chatInput.value;
+    if (message.trim() !== "") {
+        displayMessage(`You: ${message}`);
+        chatInput.value = "";
     }
 });

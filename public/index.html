@@ -3,29 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voting Game</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Multiplayer Voting Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <div id="player-list">
-            <!-- Players will be listed here -->
-        </div>
-        <div id="voting-section" style="display:none;">
-            <h2>Vote</h2>
-            <div id="vote-list">
-                <!-- Voting options will be listed here -->
+    <div class="container">
+        <div class="game-panel">
+            <h1>Multiplayer Voting Game</h1>
+            <div id="player-list">
+                <h2>Players:</h2>
+                <ul id="players">
+                    <!-- Player names will be added dynamically -->
+                </ul>
             </div>
-            <button id="submit-vote">Submit Vote</button>
-        </div>
-        <div id="status-section" style="display:none;">
-            <h2>Status</h2>
-            <div id="player-status">
-                <!-- Player status and votes will be displayed here -->
+
+            <div id="voting-section">
+                <h2>Vote for a player:</h2>
+                <div id="vote-options">
+                    <!-- Voting options will be added dynamically -->
+                </div>
+                <button id="submit-vote">Submit Vote</button>
             </div>
+
+            <div id="result-section">
+                <h2>Results:</h2>
+                <p id="results"></p>
+            </div>
+        </div>
+
+        <div class="chat-panel">
+            <h2>Game Chat</h2>
+            <div id="chat-box">
+                <!-- Chat messages will appear here -->
+            </div>
+            <input type="text" id="chat-input" placeholder="Type your message here...">
+            <button id="send-message">Send</button>
         </div>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
+
     <script src="script.js"></script>
 </body>
 </html>

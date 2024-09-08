@@ -1,45 +1,118 @@
+/* General Styling */
 body {
-    font-family: Arial, sans-serif;
-    background: #2c3e50;
-    color: #ecf0f1;
     margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #ff7b7b, #ffbf81, #ffe17b, #8bd3dd);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
+
+h1, h2 {
+    margin: 0;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    height: 80%;
+}
+
+.game-panel, .chat-panel {
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.game-panel {
+    flex: 3;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin-right: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.chat-panel {
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#player-list ul {
+    list-style: none;
     padding: 0;
 }
 
-#game-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    background: #34495e;
-    border-radius: 8px;
+#player-list li {
+    background-color: rgba(0, 0, 0, 0.4);
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
 }
 
-h2 {
-    color: #e74c3c;
+/* Voting options styling */
+#voting-section {
+    margin-top: 20px;
 }
 
-#player-list, #vote-list, #player-status {
-    margin-bottom: 20px;
+#vote-options div {
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.4);
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#vote-options div:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 button {
-    background: #e67e22;
+    background-color: #8bd3dd;
+    color: #000;
+    padding: 10px;
     border: none;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
-    margin: 5px;
+    font-weight: bold;
 }
 
 button:hover {
-    background: #d35400;
+    background-color: #ff7b7b;
+    color: #fff;
 }
 
-div {
-    margin: 10px 0;
+/* Chat styling */
+#chat-box {
+    height: 300px;
+    overflow-y: scroll;
+    border: 2px solid #fff;
+    border-radius: 5px;
     padding: 10px;
-    border-radius: 4px;
-    background: #1abc9c;
+    margin-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#chat-input {
+    width: 80%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+#send-message {
+    background-color: #ffe17b;
+    padding: 10px;
+    border-radius: 5px;
+    margin-left: 10px;
 }
